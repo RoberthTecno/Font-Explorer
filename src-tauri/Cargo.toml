@@ -1,0 +1,32 @@
+[package]
+name = "fontexplorer"
+version = "0.1.0"
+description = "Local font manager for Windows"
+edition = "2021"
+
+[lib]
+name = "fontexplorer_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# SQLite local; `bundled` compila SQLite dentro de la app (no requiere instalarlo en Windows).
+rusqlite = { version = "0.31", features = ["bundled"] }
+# Lector OpenType/TrueType en Rust puro: nombres, peso, cursiva, fvar y cmap.
+# Se usa solo desde fonts/metadata.rs para poder sustituirla sin tocar el resto.
+ttf-parser = { version = "0.25", default-features = false, features = ["std", "variable-fonts"] }
+
+# Registro de Windows (fuentes instaladas para el sistema y para el usuario).
+[target.'cfg(windows)'.dependencies]
+winreg = "0.52"
+# Aviso al sistema (AddFontResource + WM_FONTCHANGE) tras instalar una fuente.
+windows-sys = { version = "0.52", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_UI_WindowsAndMessaging"] }
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-updater = "2"
