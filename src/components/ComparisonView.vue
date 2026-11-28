@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import SampleChips from "./SampleChips.vue";
+import { SAMPLE_EN } from "../data/sampleTexts";
 import { useLibrary } from "../composables/useLibrary";
+import { compareLayout } from "../services/compareLayout";
 import { faceCoverage, faceStatus, familyWeights, representativeFace, weightLabel } from "../services/analysis";
 import { DETAIL_MAX_BYTES, descOf, ensureFace, previewStyle } from "../services/fontFaces";
 import type { FontFamilyItem } from "../types/font";
@@ -9,7 +12,7 @@ import type { FaceInfo, FamilyFile } from "../types/scan";
 const { fonts, compareIds, compareOpen, closeCompare, toggleCompare, charSets, previewText } = useLibrary();
 
 interface FaceRow { key: string; file: FamilyFile; face: FaceInfo }
-const DEFAULT_TEXT = "The quick brown fox jumps over the lazy dog — ¿Qué tal, ñandú?";
+const DEFAULT_TEXT = SAMPLE_EN;
 const text = ref("");
 const size = ref(48);
 const faceKeys = ref<Record<string, string>>({});
@@ -17,6 +20,12 @@ const faceKeys = ref<Record<string, string>>({});
 const columns = computed(() =>
   compareIds.value.map((id) => fonts.value.find((f) => f.id === id)).filter((f): f is FontFamilyItem => !!f),
 );
+// Hasta 3 fuentes: columnas a pantalla completa. De 4 en adelante: cuadros (2×2 con 4; 3×2 con 5 o 6).
+const layout = computed(() => compareLayout(columns.value.length));
+const gridStyle = computed(() => ({
+  gridTemplateColumns: `repeat(${layout.value.cols}, minmax(${layout.value.kind === "columns" ? 220 : 0}px, 1fr))`,
+  gridTemplateRows: `repeat(${layout.value.rows}, minmax(0, 1fr))`,
+}));
 const rowsOf = (f: FontFamilyItem): FaceRow[] =>
   (f.scanned?.files ?? []).flatMap((file) => file.faces.map((face) => ({ key: `${file.path}:${face.faceIndex}`, file, face })));
 const keyOfRow = (file: FamilyFile, face: FaceInfo) => `${file.path}:${face.faceIndex}`;
@@ -72,11 +81,12 @@ onBeforeUnmount(() => window.removeEventListener("keydown", onKey));
     <header class="cmp__head">
       <h2>Compare fonts <span class="muted">({{ columns.length }})</span></h2>
       <input v-model="text" class="cmp__text" aria-label="Comparison text" placeholder="Type your own text…" />
+      <SampleChips @pick="text = $event" />
       <label class="cmp__size"><span class="muted">Size</span><input v-model.number="size" type="range" min="16" max="120" aria-label="Comparison size" /><output>{{ size }}</output></label>
       <button class="btn" @click="closeCompare">Close</button>
     </header>
 
-    <div class="cmp__cols" :style="{ gridTemplateColumns: `repeat(${columns.length}, minmax(240px, 1fr))` }">
+    <div class="cmp__cols" :class="`cmp__cols--${layout.kind}`" :style="gridStyle">
       <section v-for="f in columns" :key="f.id" class="cmp__col">
         <header class="cmp__colhead">
           <strong class="cmp__name">{{ f.familyName }}</strong>

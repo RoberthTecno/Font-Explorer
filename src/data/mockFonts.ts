@@ -2,6 +2,7 @@
 // para que el preview se vea; el estado, los favoritos, las etiquetas y los conteos
 // son inventados y NO representan análisis reales.
 import type { FontFamilyItem, AnalysisStatus } from "../types/font";
+import { SAMPLE_EN, SAMPLE_ES } from "./sampleTexts";
 
 type Row = [string, AnalysisStatus, number, boolean, string[]?];
 
@@ -63,8 +64,8 @@ export const previewChips: { label: string; text: string }[] = [
   { label: "123", text: "0123456789" },
   { label: "ABC", text: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
   { label: "abc", text: "abcdefghijklmnopqrstuvwxyz" },
-  { label: "fox", text: "The quick brown fox jumps over the lazy dog" },
-  { label: "español", text: "El veloz murciélago hindú comía feliz cardillo y kiwi. ¿Qué tal? ¡Sí!" },
+  { label: "fox", text: SAMPLE_EN },
+  { label: "español", text: SAMPLE_ES },
   { label: "lorem", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit" },
   { label: "symbols", text: "© ® ™ € £ ¥ § ¶ † ‡ • ← → ★ ♥" },
 ];

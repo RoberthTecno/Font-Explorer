@@ -1,6 +1,6 @@
 # FontExplorer
 
-Versión 5.3 — Slider rápido, importar/exportar fuentes (sobre la 5.2: preview con archivo real, comparación) (Tauri 2 + Vue 3 + TypeScript + Rust).
+Versión 5.4 — Comparación en columnas o cuadros, textos de ejemplo completos (sobre la 5.3) (Tauri 2 + Vue 3 + TypeScript + Rust).
 
 ## Requisitos (Windows 10/11)
 - Node.js 20+
@@ -39,6 +39,12 @@ Versión 5.3 — Slider rápido, importar/exportar fuentes (sobre la 5.2: previe
 - **Detalle completo**: preview con texto editable en cada variante (con su peso y cursiva), resumen de español y símbolos, nombres internos, archivos, etiquetas y cobertura por variante. Si hay filtros de cobertura activos, marca la variante que cumple.
 - Las familias sin análisis (datos de ejemplo) quedan excluidas de los filtros de análisis, no se muestran como "incompatibles".
 - Pruebas: `npm test` (14) y `cargo test` (15).
+
+## Versión 5.4
+- **Comparación:** de 1 a 3 fuentes se muestran en **columnas** a pantalla completa; de 4 a 6, en **cuadros** (2×2 con 4, 3×2 con 5 o 6), siempre ajustados a la ventana sin desplazamiento.
+- **Textos de ejemplo completos** (`src/data/sampleTexts.ts`): inglés "The quick brown fox jumps over the lazy dog and runs away." y español "Benjamín pidió una bebida de kiwi y fresa. Noé, sin vergüenza, la más exquisita champaña del menú". Se usan en la barra de preview (chips *fox* y *español*), en el detalle y en la comparación, donde además hay botones *English* y *Español*.
+- La barra de selección ya no tiene Export (Compare y Clear). Exportar sigue en el botón Export de arriba, con la opción "Selected fonts".
+- Pruebas: `npm test` (34) y `cargo test` (21).
 
 ## Versión 5.3
 - **Slider de tamaño rápido:** el tamaño es una sola variable CSS del contenedor y las tarjetas fuera de pantalla no se calculan (`content-visibility: auto`). Con 1500 fuentes simuladas, cada cambio de tamaño pasó de ~1100 ms a ~32 ms. Las fuentes reales solo se cargan para las tarjetas visibles.

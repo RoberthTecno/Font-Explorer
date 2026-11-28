@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useLibrary } from "../composables/useLibrary";
+import SampleChips from "./SampleChips.vue";
+import { SAMPLE_EN } from "../data/sampleTexts";
 import { faceCoverage, faceStatus, familyStyles, familyWeights, weightLabel } from "../services/analysis";
 import { faceMatchesCoverage, hasCoverageFilters } from "../services/filters";
 import { DETAIL_MAX_BYTES, descOf, ensureFace, previewStyle } from "../services/fontFaces";
@@ -37,7 +39,7 @@ const coverageFilterOn = computed(() => hasCoverageFilters(filters.value));
 const meets = (r: FaceRow) => coverageFilterOn.value && faceMatchesCoverage(r.face, filters.value, charSets.value);
 
 // ---------- Preview editable ----------
-const DEFAULT_TEXT = "The quick brown fox jumps over the lazy dog";
+const DEFAULT_TEXT = SAMPLE_EN;
 const sample = ref("");
 const size = ref(40);
 
@@ -111,6 +113,7 @@ const kb = (n: number) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${
       <h3>Preview</h3>
       <div class="preview">
         <input v-model="sample" class="preview__text" aria-label="Preview text" placeholder="Type your own text…" />
+        <SampleChips @pick="sample = $event" />
         <label class="preview__size"><span class="muted">Size</span><input v-model.number="size" type="range" min="16" max="120" aria-label="Preview size" /><output>{{ size }}</output></label>
       </div>
       <ul class="variants" aria-label="Variants">
