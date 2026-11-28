@@ -13,6 +13,7 @@ import ComparisonView from "./components/ComparisonView.vue";
 import FontDetails from "./components/FontDetails.vue";
 import SettingsView from "./components/SettingsView.vue";
 import { useLibrary } from "./composables/useLibrary";
+import { ask } from "@tauri-apps/plugin-dialog";
 import { checkForUpdates } from "./services/updateService.js";
 
 const { visibleFonts, viewMode, previewSize, previewText, sidebarOpen, section, toggleFavorite, scanning, initScan,
@@ -22,18 +23,17 @@ onMounted(() => {
 
   checkForUpdates()
     .then(async (result) => {
-      if (result.available) {
-        const confirmUpdate = window.confirm(
-          `Hay una nueva versión (${result.version}) de Font Explorer. ¿Deseas actualizar?`
-        );
-
-        if (confirmUpdate) {
-          await result.install();
-        }
-      }
+      if (!result.available) return;
+      // ask() devuelve de verdad true/false. window.confirm, con el plugin de diálogos, devuelve una promesa
+      // (siempre "verdadera"), así que "Cancelar" instalaba igual.
+      const accepted = await ask(
+        `Hay una nueva versión (${result.version}) de Font Explorer. ¿Deseas actualizar?`,
+        { title: "Font Explorer", kind: "info", okLabel: "Actualizar", cancelLabel: "Ahora no" },
+      );
+      if (accepted) await result.install();
     })
     .catch((error) => {
-      console.error('Error comprobando actualizaciones:', error);
+      console.error("Error comprobando actualizaciones:", error);
     });
 });
 

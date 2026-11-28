@@ -17,6 +17,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set app version from the tag
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag '$GITHUB_REF_NAME' must look like v1.2.3"; exit 1
+          fi
+          echo "Building version $VERSION"
+          node -e "
+            const fs = require('fs');
+            for (const f of ['package.json', 'src-tauri/tauri.conf.json']) {
+              const j = JSON.parse(fs.readFileSync(f, 'utf8'));
+              j.version = '$VERSION';
+              fs.writeFileSync(f, JSON.stringify(j, null, 2) + '\n');
+            }
+          "
+          sed -i "0,/^version = \".*\"/s//version = \"$VERSION\"/" src-tauri/Cargo.toml
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
