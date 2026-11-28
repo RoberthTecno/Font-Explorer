@@ -1,6 +1,17 @@
 import { check } from '@tauri-apps/plugin-updater';
 
-export async function checkForUpdates() {
+type UpdateResult =
+  | {
+      available: false;
+      version: null;
+    }
+  | {
+      available: true;
+      version: string;
+      install: () => Promise<void>;
+    };
+
+export async function checkForUpdates(): Promise<UpdateResult> {
   try {
     const update = await check();
 
@@ -18,7 +29,6 @@ export async function checkForUpdates() {
         await update.downloadAndInstall();
       }
     };
-
   } catch (error) {
     console.error('Error checking updates:', error);
     throw error;

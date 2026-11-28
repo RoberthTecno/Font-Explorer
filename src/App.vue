@@ -17,15 +17,25 @@ import { checkForUpdates } from "./services/updateService.js";
 
 const { visibleFonts, viewMode, previewSize, previewText, sidebarOpen, section, toggleFavorite, scanning, initScan,
   openFont, openContextMenu, selectedFont, compareIds, toggleCompare } = useLibrary();
-onMounted(initScan);
+onMounted(() => {
+  initScan();
 
+  checkForUpdates()
+    .then(async (result) => {
+      if (result.available) {
+        const confirmUpdate = window.confirm(
+          `Hay una nueva versión (${result.version}) de Font Explorer. ¿Deseas actualizar?`
+        );
 
-const result = await checkForUpdates();
-
-if (result.available) {
-  console.log('Nueva versión:', result.version);
-  //await result.install();
-}
+        if (confirmUpdate) {
+          await result.install();
+        }
+      }
+    })
+    .catch((error) => {
+      console.error('Error comprobando actualizaciones:', error);
+    });
+});
 
 
 </script>
